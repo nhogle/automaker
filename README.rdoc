@@ -4,7 +4,7 @@ This tool is inspired by autotest/autospec and automatically calls make when som
 
 == Prerequisites and dependencies
 
-Since it uses the FSEvents API it only works on Mac OS X and it requires the fsevets gem. See Installing.
+Since it uses the FSEvents API it only works on Mac OS X and it requires the fsevents gem. See Installing.
 
 == Installing
 
