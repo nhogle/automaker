@@ -5,13 +5,13 @@
 
 Gem::Specification.new do |s|
   s.name = %q{automaker}
-  s.version = "0.0.9"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ronald Evers"]
   s.date = %q{2009-12-15}
   s.default_executable = %q{automaker}
-  s.description = %q{Will monitor a directory using fsevents api and call make when something changes.}
+  s.description = %q{Will monitor a directory using fsevents api and call make when something changes. Only works on Mac OS X.}
   s.email = %q{ronaldpaulusevers@gmail.com}
   s.executables = ["automaker"]
   s.extra_rdoc_files = [
@@ -23,6 +23,8 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
+     "automaker.gemspec",
+     "bin/automaker",
      "lib/automaker.rb"
   ]
   s.homepage = %q{http://github.com/ronaldevers/automaker}
