@@ -4,8 +4,7 @@ This tool is inspired by autotest/autospec and automatically calls make when som
 
 == Prerequisites and dependencies
 
-* uses FSEvents API so work only on Mac OS X
-* requires fsevents gem
+Since it uses the FSEvents API it only works on Mac OS X and it requires the fsevets gem. See Installing.
 
 == Installing
 
@@ -15,13 +14,13 @@ It's on gemcutter so just do:
 
 == Using
 
-Like autospec:
+Specify the path to watch and the patterns to look for in filenames of changed files:
 
-    $ automaker [/path/to/watch]
+    $ automaker /path/to/watch .tex .whatever
 
 == Todo
 
-* need to make it return a proper exit code
+* make it return a proper exit code
 * make it react to ctrl-c autospec-style
   - ctrl-c c to make clean
   - ctrl-c a to make all
