@@ -2,15 +2,17 @@ require 'rubygems'
 require 'fsevents'
 
 class Automaker
-	def	initialize
+  def run
 		if !check_arguments
 		  print_usage
+		  1
 	  else
   		@path_to_watch = ARGV.shift
   		@filters = ARGV
       run_stream
+      0
 		end
-	end
+  end
 
 	def check_arguments
 		ARGV.size > 1
@@ -24,8 +26,6 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
 
 	def run_stream
 		stream = FSEvents::Stream.watch(@path_to_watch) { |events|
-		  puts "FILES MODIFIED"
-		  puts events.modified_files
 		  make if should_make(events.modified_files)
 		}
 		stream.run
