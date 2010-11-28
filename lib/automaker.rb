@@ -24,18 +24,10 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
   end
 
   def run_stream
-    notifier = INotify::Notifier.new
     notifier.watch path_to_watch, :modify do |event|
       make if should_make [event.name]
     end
-
-    if ENV["test"]
-      if IO.select([notifier.to_io], [], [], 10)
-        notifier.process
-      end
-    else
-      notifier.run
-    end
+    notifier.run
   end
   
   def should_make(modified_files)
@@ -50,6 +42,10 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
   end
 
   private
+    def notifier
+      @notifier ||= INotify::Notifier.new
+    end
+
     def default_options
       { :path_to_watch => ".",
         :path_to_build => "./build" }

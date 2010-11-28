@@ -12,6 +12,23 @@ all:
 MAKEFILE
 
 describe Automaker do
+  before :all do
+    Automaker.class_eval do
+      private
+        def notifier
+          @notifier ||= begin
+            INotify::Notifier.new.tap do |notifier|
+              def notifier.run
+                if IO.select([self.to_io], [], [], 2)
+                  self.process
+                end
+              end
+            end
+          end
+        end
+    end
+  end
+
   before do
     FileUtils.mkdir_p BUILD_PATH
     File.open "#{BUILD_PATH}/Makefile", "w" do |f|
