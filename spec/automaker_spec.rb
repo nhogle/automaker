@@ -64,7 +64,7 @@ describe Automaker do
       end
 
       automaker do
-        `echo "asdf" >> schleevens/file`
+        `echo "asdf" >> schleevens/file 2>&1`
       end
       File.exists?("deliverable").should be_true
     end
@@ -80,6 +80,13 @@ def automaker(args_string = "")
     ENV["test"] = "true"
     Automaker.run args_string.split
   end
-  yield
+
+  Thread.new do
+    while true
+      yield
+      sleep 0.1
+    end
+  end
+
   thread.join
 end
