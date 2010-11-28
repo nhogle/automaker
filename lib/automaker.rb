@@ -3,24 +3,15 @@ require 'rb-inotify'
 
 class Automaker
   def run(args)
-    if !check_arguments(args)
-      print_usage
-      1
-    else
-      @path_to_watch = args.shift
-      @path_to_build = args.shift
-      @filters = args
-      run_stream
-      0
-    end
+    @path_to_watch = args.shift || "."
+    @path_to_build = args.shift || "./build"
+    @filters = args
+    run_stream
+    0
   end
 
-  def check_arguments(args)
-    args.size > 1
-  end
-  
   def print_usage
-   $stderr.puts "Usage: automaker </path/to/watch> </path/to/build> <filter> [filter [filter [ etc.. ]]]
+   $stderr.puts "Usage: automaker </path/to/watch> </path/to/build> [filter [filter [ etc.. ]]]
 You must specify the path to watch. Make is only triggered if a file whose name
 one of the filters is changed. (Otherwise you will likely enter an infinite loop.)"
   end
@@ -34,12 +25,9 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
   end
   
   def should_make(modified_files)
-    modified_files.each { |filename|
-      @filters.each { |filter|
-        return true if filename.include?(filter)
-      }
-    }
-    false
+    modified_files.any? do |filename|
+      @filters.empty? or @filters.any? { |filter| filename.include?(filter) }
+    end
   end
   
   def make

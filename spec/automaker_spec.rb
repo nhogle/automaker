@@ -2,7 +2,8 @@ require "rubygems"
 require "automaker"
 require "fileutils"
 
-PROJECT_PATH = "tmp/project"
+PWD = `pwd`.chomp
+PROJECT_PATH = "#{PWD}/tmp/project"
 BUILD_PATH = "#{PROJECT_PATH}/build"
 MAKEFILE = """
 all:
@@ -18,22 +19,31 @@ describe Automaker do
   end
 
   it "runs make when I change a file" do
-    automaker "#{PROJECT_PATH}/ #{BUILD_PATH} file" do
+    Dir.chdir PROJECT_PATH do
+      automaker do
+        `echo "asdf" >> file`
+      end
+      File.exists?("deliverable").should be_true
+    end
+  end
+
+  it "takes arguments for watch path and build path" do
+    automaker "#{PROJECT_PATH}/ #{BUILD_PATH}" do
       `echo "asdf" >> #{PROJECT_PATH}/file`
     end
     File.exists?("#{PROJECT_PATH}/deliverable").should be_true
   end
+
+  after do
+    FileUtils.rm_rf PROJECT_PATH
+  end
 end
 
-def automaker(args_string)
+def automaker(args_string = "")
   thread = Thread.new do
-    puts `./bin/automaker #{args_string} &2>1`
+    puts `#{PWD}/bin/automaker #{args_string} 2>&1`
   end
-  sleep 1
+  sleep 0.2
   yield
   thread.kill!
-end
-
-at_exit do
-  FileUtils.rm_rf PROJECT_PATH
 end
