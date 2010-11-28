@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'fsevents'
+require 'rb-inotify'
 
 class Automaker
   def run
@@ -8,6 +8,7 @@ class Automaker
       1
     else
       @path_to_watch = ARGV.shift
+      @path_to_build = ARGV.shift
       @filters = ARGV
       run_stream
       0
@@ -19,16 +20,17 @@ class Automaker
   end
   
   def print_usage
-   $stderr.puts "Usage: automaker </path/to/watch> <filter> [filter [filter [ etc.. ]]]
+   $stderr.puts "Usage: automaker </path/to/watch> </path/to/build> <filter> [filter [filter [ etc.. ]]]
 You must specify the path to watch. Make is only triggered if a file whose name
 one of the filters is changed. (Otherwise you will likely enter an infinite loop.)"
   end
 
   def run_stream
-    stream = FSEvents::Stream.watch(@path_to_watch) { |events|
-      make if should_make(events.modified_files)
-    }
-    stream.run
+    notifier = INotify::Notifier.new
+    notifier.watch( @path_to_watch, :modify ) do |event|
+      make if should_make( [event.name] )
+    end
+    notifier.run
   end
   
   def should_make(modified_files)
@@ -41,6 +43,6 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
   end
   
   def make
-    system("cd #{@path_to_watch} && make")
+    system("cd #{@path_to_build} && make")
   end
 end
