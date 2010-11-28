@@ -29,7 +29,7 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
       make if should_make [event.name]
     end
 
-    if ENV['test'] == "true"
+    if ENV["test"]
       if IO.select([notifier.to_io], [], [], 10)
         notifier.process
       end
@@ -45,7 +45,8 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
   end
   
   def make
-    system "cd #{path_to_build} && make"
+    command = "cd #{path_to_build} && make"
+    ENV["test"] ? `#{command}` : system(command)
   end
 
   private

@@ -6,14 +6,10 @@ require "ruby-debug"
 PWD = `pwd`.chomp
 PROJECT_PATH = "#{PWD}/tmp/project"
 BUILD_PATH = "#{PROJECT_PATH}/build"
-MAKEFILE = """
+MAKEFILE = <<-MAKEFILE
 all:
 	touch ../deliverable
-"""
-AUTOMAKER_CONF = """
-:path_to_watch: schleevens
-:path_to_build: ballzac
-"""
+MAKEFILE
 
 describe Automaker do
   before do
@@ -44,7 +40,10 @@ describe Automaker do
       FileUtils.mv "build", "ballzac"
       FileUtils.mkdir "schleevens"
       File.open ".automaker", "w" do |f|
-        f.write AUTOMAKER_CONF
+        f.write <<-AUTOMAKER.gsub(/^ {10}/, '')
+          :path_to_watch: schleevens
+          :path_to_build: ballzac
+        AUTOMAKER
       end
 
       automaker do
@@ -61,9 +60,9 @@ end
 
 def automaker(args_string = "")
   thread = Thread.new do
-    ENV['test'] = "true"
+    ENV["test"] = "true"
     Automaker.run args_string.split
   end
   yield
-  thread.kill!
+  thread.join
 end
