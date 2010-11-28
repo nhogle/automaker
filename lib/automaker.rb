@@ -27,8 +27,9 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
 
   def run_stream
     notifier = INotify::Notifier.new
-    notifier.watch( @path_to_watch, :modify ) do |event|
-      make if should_make( [event.name] )
+    notifier.watch @path_to_watch, :modify do |event|
+      puts "omg"
+      make if should_make [event.name]
     end
     notifier.run
   end
