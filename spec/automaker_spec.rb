@@ -11,24 +11,22 @@ all:
 	touch ../deliverable
 MAKEFILE
 
-describe Automaker do
-  before :all do
-    Automaker.class_eval do
-      private
-        def notifier
-          @notifier ||= begin
-            INotify::Notifier.new.tap do |notifier|
-              def notifier.run
-                if IO.select([self.to_io], [], [], 2)
-                  self.process
-                end
-              end
+class AutomakerTest < Automaker
+  private
+    def notifier
+      @notifier ||= begin
+        INotify::Notifier.new.tap do |notifier|
+          def notifier.run
+            if IO.select([self.to_io], [], [], 2)
+              self.process
             end
           end
         end
+      end
     end
-  end
+end
 
+describe Automaker do
   before do
     FileUtils.mkdir_p BUILD_PATH
     File.open "#{BUILD_PATH}/Makefile", "w" do |f|
@@ -92,7 +90,7 @@ end
 def automaker(args_string = "")
   thread = Thread.new do
     ENV["test"] = "true"
-    Automaker.run args_string.split
+    AutomakerTest.run args_string.split
   end
   yield
   thread.join
