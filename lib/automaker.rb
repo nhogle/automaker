@@ -25,7 +25,14 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
     notifier.watch path_to_watch, :modify do |event|
       make if should_make [event.name]
     end
-    notifier.run
+
+    if ENV['test'] == "true"
+      if IO.select([notifier.to_io], [], [], 10)
+        notifier.process
+      end
+    else
+      notifier.run
+    end
   end
   
   def should_make(modified_files)

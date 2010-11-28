@@ -41,9 +41,9 @@ end
 
 def automaker(args_string = "")
   thread = Thread.new do
-    puts `#{PWD}/bin/automaker #{args_string} 2>&1`
+    ENV['test'] = "true"
+    Automaker.run args_string.split
   end
-  sleep 0.2
   yield
   thread.kill!
 end
