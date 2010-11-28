@@ -25,15 +25,13 @@ describe Automaker do
   end
 end
 
-def automaker(args)
-  pid = fork do
-    puts `./bin/automaker #{args} &2>1`
+def automaker(args_string)
+  thread = Thread.new do
+    puts `./bin/automaker #{args_string} &2>1`
   end
   sleep 1
   yield
-  sleep 1
-  Process.kill 9, pid
-  Process.waitpid pid
+  thread.kill!
 end
 
 at_exit do

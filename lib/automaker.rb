@@ -2,21 +2,21 @@ require 'rubygems'
 require 'rb-inotify'
 
 class Automaker
-  def run
-    if !check_arguments
+  def run(args)
+    if !check_arguments(args)
       print_usage
       1
     else
-      @path_to_watch = ARGV.shift
-      @path_to_build = ARGV.shift
-      @filters = ARGV
+      @path_to_watch = args.shift
+      @path_to_build = args.shift
+      @filters = args
       run_stream
       0
     end
   end
 
-  def check_arguments
-    ARGV.size > 1
+  def check_arguments(args)
+    args.size > 1
   end
   
   def print_usage
@@ -28,7 +28,6 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
   def run_stream
     notifier = INotify::Notifier.new
     notifier.watch @path_to_watch, :modify do |event|
-      puts "omg"
       make if should_make [event.name]
     end
     notifier.run
