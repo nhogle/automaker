@@ -1,6 +1,7 @@
 require "rubygems"
 require "automaker"
 require "fileutils"
+require "ruby-debug"
 
 PWD = `pwd`.chomp
 PROJECT_PATH = "#{PWD}/tmp/project"
@@ -8,6 +9,10 @@ BUILD_PATH = "#{PROJECT_PATH}/build"
 MAKEFILE = """
 all:
 	touch ../deliverable
+"""
+AUTOMAKER_CONF = """
+:path_to_watch: schleevens
+:path_to_build: ballzac
 """
 
 describe Automaker do
@@ -32,6 +37,21 @@ describe Automaker do
       `echo "asdf" >> #{PROJECT_PATH}/file`
     end
     File.exists?("#{PROJECT_PATH}/deliverable").should be_true
+  end
+
+  it "takes options from an .automaker file" do
+    Dir.chdir PROJECT_PATH do
+      FileUtils.mv "build", "ballzac"
+      FileUtils.mkdir "schleevens"
+      File.open ".automaker", "w" do |f|
+        f.write AUTOMAKER_CONF
+      end
+
+      automaker do
+        `echo "asdf" >> schleevens/file`
+      end
+      File.exists?("deliverable").should be_true
+    end
   end
 
   after do

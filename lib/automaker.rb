@@ -1,15 +1,18 @@
 require 'rubygems'
 require 'rb-inotify'
+require 'yaml'
 
 class Automaker
   def self.run(args)
-    new :path_to_watch => args.shift || ".",
-      :path_to_build => args.shift || "./build",
-      :filters => args
+    options = { :path_to_watch => args.shift,
+      :path_to_build => args.shift,
+      :filters => args }
+    options.delete_if { |key, value| value.nil? }
+    new options
   end
 
   def initialize(options)
-    @options = options
+    @options = default_options.merge(options_from_file).merge(options)
     run_stream
     0
   end
@@ -46,6 +49,15 @@ one of the filters is changed. (Otherwise you will likely enter an infinite loop
   end
 
   private
+    def default_options
+      { :path_to_watch => ".",
+        :path_to_build => "./build" }
+    end
+
+    def options_from_file
+      File.exist?(".automaker") ? YAML.load_file(".automaker") : {}
+    end
+
     def path_to_watch
       @options[:path_to_watch]
     end
