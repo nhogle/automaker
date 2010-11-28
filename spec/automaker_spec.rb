@@ -11,24 +11,22 @@ all:
 	touch ../deliverable
 MAKEFILE
 
-describe Automaker do
-  before :all do
-    Automaker.class_eval do
-      private
-        def notifier
-          @notifier ||= begin
-            INotify::Notifier.new.tap do |notifier|
-              def notifier.run
-                if IO.select([self.to_io], [], [], 2)
-                  self.process
-                end
-              end
+class AutomakerTest < Automaker
+  private
+    def notifier
+      @notifier ||= begin
+        INotify::Notifier.new.tap do |notifier|
+          def notifier.run
+            if IO.select([self.to_io], [], [], 2)
+              self.process
             end
           end
         end
+      end
     end
-  end
+end
 
+describe Automaker do
   before do
     FileUtils.mkdir_p BUILD_PATH
     File.open "#{BUILD_PATH}/Makefile", "w" do |f|
@@ -70,6 +68,20 @@ describe Automaker do
     end
   end
 
+  it "takes a set of filters as a whitelist" do
+    Dir.chdir PROJECT_PATH do
+      automaker ". ./build .cpp" do
+        `echo "asdf" >> file.h`
+      end
+      File.exists?("deliverable").should_not be_true
+
+      automaker ". ./build .cpp" do
+        `echo "asdf" >> file.cpp`
+      end
+      File.exists?("deliverable").should be_true
+    end
+  end
+
   after do
     FileUtils.rm_rf PROJECT_PATH
   end
@@ -78,7 +90,7 @@ end
 def automaker(args_string = "")
   thread = Thread.new do
     ENV["test"] = "true"
-    Automaker.run args_string.split
+    AutomakerTest.run args_string.split
   end
 
   Thread.new do
