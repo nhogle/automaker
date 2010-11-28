@@ -37,7 +37,7 @@ describe Automaker do
   it "runs make when I change a file" do
     Dir.chdir PROJECT_PATH do
       automaker do
-        `echo "asdf" >> file`
+        `echo "asdf" >> #{PROJECT_PATH}/file`
       end
       File.exists?("deliverable").should be_true
     end
