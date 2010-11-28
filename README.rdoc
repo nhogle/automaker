@@ -4,7 +4,7 @@ This tool is inspired by autotest/autospec and automatically calls make when som
 
 == Prerequisites and dependencies
 
-Since it uses the FSEvents API it only works on Mac OS X and it requires the fsevents gem. See Installing.
+Since it uses Linux's INotifier API it only works on Linux and it requires the rb-inotify gem. See Installing.
 
 == Installing
 
@@ -14,9 +14,17 @@ It's on gemcutter so just do:
 
 == Using
 
-Specify the path to watch and the patterns to look for in filenames of changed files:
+Specify the path to watch, the directory in which to run make and the patterns to look for in filenames of changed files:
 
-    $ automaker /path/to/watch .tex .whatever
+    $ automaker /path/to/watch /path/to/dir_containing_makefile .tex .whatever
+
+Alternately, include a .automaker YAML file in the directory you want to run Automaker from.  An example .automaker file is show here:
+
+	:path_to_watch: src/
+	:path_to_build: build/
+	:filters:
+	- .cpp
+	- .h
 
 == Todo
 

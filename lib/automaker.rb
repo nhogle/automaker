@@ -4,6 +4,7 @@ require 'yaml'
 
 class Automaker
   def self.run(args)
+    print_usage if args.include? "--help"
     options = { :path_to_watch => args.shift,
       :path_to_build => args.shift,
       :filters => args }
@@ -11,16 +12,18 @@ class Automaker
     new options
   end
 
+  def self.print_usage
+    $stderr.puts """ Usage: automaker [/path/to/watch] [/path/to/build] [filter [filter [ etc.. ]]]
+
+  - If you do not specify a path to watch, it will default to the current directory.  
+  - If you do not specify a build path, it will default to ./build."""
+    exit
+  end
+
   def initialize(options)
     @options = default_options.merge(options_from_file).merge(options)
     run_stream
     0
-  end
-
-  def print_usage
-    $stderr.puts "Usage: automaker [/path/to/watch] [/path/to/build] [filter [filter [ etc.. ]]]
-You must specify the path to watch. Make is only triggered if a file whose name
-one of the filters is changed. (Otherwise you will likely enter an infinite loop.)"
   end
 
   def run_stream
