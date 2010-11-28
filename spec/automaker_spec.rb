@@ -70,6 +70,20 @@ describe Automaker do
     end
   end
 
+  it "takes a set of filters as a whitelist" do
+    Dir.chdir PROJECT_PATH do
+      automaker ". ./build .cpp" do
+        `echo "asdf" >> file.h`
+      end
+      File.exists?("deliverable").should_not be_true
+
+      automaker ". ./build .cpp" do
+        `echo "asdf" >> file.cpp`
+      end
+      File.exists?("deliverable").should be_true
+    end
+  end
+
   after do
     FileUtils.rm_rf PROJECT_PATH
   end
